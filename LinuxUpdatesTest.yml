@@ -1,16 +1,15 @@
 ---
 - hosts: all
-  become: true
-  become_method: sudo
+  become: true    # Ensures that all tasks run with sudo privileges
 
   tasks:
-    - name: Update and upgrade packages on Ubuntu
+    - name: Update and upgrade packages on Ubuntu/Debian
       apt:
-        upgrade: yes
         update_cache: yes
+        upgrade: yes
       when: ansible_os_family == "Debian"
 
-    - name: Update and upgrade packages on CentOS
+    - name: Update and upgrade packages on CentOS/RedHat
       yum:
         name: '*'
         state: latest
