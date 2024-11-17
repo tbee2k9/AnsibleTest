@@ -4,3 +4,8 @@
   tasks:
     - name: Test sudo access
       command: whoami
+      register: result
+
+    - name: Print result
+      debug:
+        msg: "{{ result.stdout }}"
