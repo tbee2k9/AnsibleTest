@@ -1,6 +1,6 @@
 - hosts: all
-  become: true    # Ensures that all tasks run with sudo privileges
-  gather_facts: true   # Ensures that OS details are gathered
+  become: true
+  gather_facts: true
 
   tasks:
     - name: Ensure system is up-to-date on Debian/Ubuntu
@@ -27,15 +27,28 @@
         state: latest
       when: ansible_os_family == "Suse"
 
+    - name: Check if reboot is required (Debian-based)
+      stat:
+        path: /var/run/reboot-required
+      register: reboot_required
+      when: ansible_os_family == "Debian"
+
     - name: Reboot the system if needed (Debian-based)
       command: /sbin/shutdown -r now "Reboot initiated by Ansible"
       when:
         - ansible_os_family == "Debian"
-        - ansible_facts['pkg_mgr'] == 'apt'
         - reboot_required.stat.exists
-      register: reboot_required
-      failed_when: reboot_required.rc not in [0, 1]
+      ignore_errors: true
+
+    - name: Check if reboot is required (RedHat-based)
+      shell: "needs-restarting -r"
+      register: needs_reboot
+      failed_when: needs_reboot.rc not in [0, 1]
+      when: ansible_os_family == "RedHat"
 
     - name: Reboot the system if needed (RedHat-based)
-      shell: "needs-restarting -r || /sbin/reboot"
-      when: ansible_os_family == "RedHat"
+      shell: /sbin/reboot
+      when:
+        - ansible_os_family == "RedHat"
+        - needs_reboot.rc == 1
+      ignore_errors: true
