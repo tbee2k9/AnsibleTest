@@ -10,3 +10,10 @@
         name: '*'
         state: latest
       when: ansible_os_family == "RedHat"
+
+    # Update packages on Ubuntu/Debian
+    - name: Ensure system is up-to-date on Ubuntu/Debian
+      apt:
+        update_cache: yes
+        upgrade: dist
+      when: ansible_os_family == "Debian"
