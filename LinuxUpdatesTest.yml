@@ -1,16 +1,41 @@
----
 - hosts: all
   become: true    # Ensures that all tasks run with sudo privileges
+  gather_facts: true   # Ensures that OS details are gathered
 
   tasks:
-    - name: Update and upgrade packages on Ubuntu/Debian
+    - name: Ensure system is up-to-date on Debian/Ubuntu
       apt:
         update_cache: yes
-        upgrade: yes
+        upgrade: dist
       when: ansible_os_family == "Debian"
 
-    - name: Update and upgrade packages on CentOS/RedHat
+    - name: Ensure system is up-to-date on RedHat/CentOS
       yum:
         name: '*'
         state: latest
+      when: ansible_os_family == "RedHat"
+
+    - name: Ensure system is up-to-date on Fedora
+      dnf:
+        name: '*'
+        state: latest
+      when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora"
+
+    - name: Ensure system is up-to-date on openSUSE/SUSE
+      zypper:
+        name: '*'
+        state: latest
+      when: ansible_os_family == "Suse"
+
+    - name: Reboot the system if needed (Debian-based)
+      command: /sbin/shutdown -r now "Reboot initiated by Ansible"
+      when:
+        - ansible_os_family == "Debian"
+        - ansible_facts['pkg_mgr'] == 'apt'
+        - reboot_required.stat.exists
+      register: reboot_required
+      failed_when: reboot_required.rc not in [0, 1]
+
+    - name: Reboot the system if needed (RedHat-based)
+      shell: "needs-restarting -r || /sbin/reboot"
       when: ansible_os_family == "RedHat"
