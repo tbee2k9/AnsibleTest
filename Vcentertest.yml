@@ -1,11 +1,12 @@
 ---
-- name: Test VMware connection
-  hosts: localhost
-  gather_facts: no
-  tasks:
-    - name: Test vCenter connectivity
-      vmware_vm_info:
-        hostname: "{{ vcenter_hostname }}"
-        username: "{{ vcenter_username }}"
-        password: "{{ vcenter_password }}"
-        validate_certs: "{{ vcenter_validate_certs | default(false) }}"
+- name: Test vCenter connectivity
+  vmware_vm_info:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: "{{ vcenter_validate_certs | default(false) }}"
+  register: vcenter_info
+
+- name: Show vCenter connection info
+  debug:
+    var: vcenter_info
