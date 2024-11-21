@@ -1,4 +1,3 @@
-echo "
 ---
 - name: Test VMware connection
   hosts: localhost
@@ -6,8 +5,7 @@ echo "
   tasks:
     - name: Test vCenter connectivity
       vmware_vm_info:
-        hostname: '{{ vcenter_hostname }}'
-        username: '{{ vcenter_username }}'
-        password: '{{ vcenter_password }}'
-        validate_certs: '{{ vcenter_validate_certs | default(false) }}'
-"
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: "{{ vcenter_validate_certs | default(false) }}"
