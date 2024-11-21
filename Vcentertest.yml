@@ -1,4 +1,3 @@
----
 - name: Test vCenter connectivity
   vmware_vm_info:
     hostname: "{{ vcenter_hostname }}"
